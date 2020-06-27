@@ -9,23 +9,23 @@ RUN apk add --no-cache \
     rsync=3.1.3-r3
 
 ENV VERSION 0.64.0
+ENV HUGO_FILE_TARGZ hugo.tar.gz
 
 WORKDIR /tmp
 
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 
-RUN curl -L \
-      https://github.com/gohugoio/hugo/releases/download/v${VERSION}/hugo_${VERSION}_linux-64bit.tar.gz \
-      | tar -xz \
+RUN curl -o ${HUGO_FILE_TARGZ} -fSL https://github.com/gohugoio/hugo/releases/download/v${VERSION}/hugo_${VERSION}_linux-64bit.tar.gz; \
+    echo "99c4752bd46c72154ec45336befdf30c28e6a570c3ae7cc237375cf116cba1f8 *${HUGO_FILE_TARGZ}" | sha256sum -c -;  tar -xvf ${HUGO_FILE_TARGZ} \
     && mv hugo /usr/local/bin/hugo \
-    && curl -L \
-      https://bin.equinox.io/c/dhgbqpS8Bvy/minify-stable-linux-amd64.tgz | tar -xz \
-    && mv minify /usr/local/bin/ \
     && addgroup -Sg 1000 hugo \
-    && adduser -SG hugo -u 1000 -h /src hugo
+    && adduser -SG hugo -u 1000 -h /src hugo \
+    && rm -rf /tmp/*
 
 WORKDIR /src
 
 EXPOSE 1313
 
 ENTRYPOINT ["hugo", "server", "-w", "--bind=0.0.0.0"]
+
+HEALTHCHECK CMD hugo --debug
