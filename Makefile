@@ -8,7 +8,10 @@ CONTAINER_NAME ?= hugo-builder-container
 
 ################################
 
-build:
+lint: Dockerfile
+	hadolint Dockerfile
+
+build: lint
 	@echo "Building Hugo Builder container..."
 	@docker build -t ${NS}/${IMAGE_NAME} .
 	@echo "Hugo Builder container built!"
@@ -23,7 +26,7 @@ push:
 release: build
 	make push -e VERSION=${VERSION}
 
-.PHONY: build run push release
+.PHONY: lint build run push release
 
 default: build
 

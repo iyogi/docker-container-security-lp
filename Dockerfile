@@ -1,17 +1,20 @@
-FROM alpine:latest
+FROM alpine:3.12.0
 
-MAINTAINER PS <psellars@gmail.com>
+LABEL maintainer="PS <psellars@gmail.com>"
 
 RUN apk add --no-cache \
-    curl \
-    git \
-    openssh-client \
-    rsync
+    curl=7.69.1-r0 \
+    git=2.26.2-r0 \
+    openssh-client=8.3_p1-r0 \
+    rsync=3.1.3-r3
 
 ENV VERSION 0.64.0
-RUN mkdir -p /usr/local/src \
-    && cd /usr/local/src \
-    && curl -L \
+
+WORKDIR /tmp
+
+SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
+
+RUN curl -L \
       https://github.com/gohugoio/hugo/releases/download/v${VERSION}/hugo_${VERSION}_linux-64bit.tar.gz \
       | tar -xz \
     && mv hugo /usr/local/bin/hugo \
