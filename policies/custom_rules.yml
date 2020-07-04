@@ -1,0 +1,71 @@
+---
+profile:
+  name: "Custom Rules"
+  description: "Set of rules focus on maintainence aspects of Dockerfiles"
+
+line_rules:
+
+  FROM: 
+    paramSyntaxRegex: /^[\w./\-:]+(:[\w.]+)?(-[\w]+)?$/
+    rules: 
+      - 
+        label: "is_latest_tag"
+        regex: /latest/
+        level: "error"
+        message: "base image uses 'latest' tag"
+        description: "using the 'latest' tag may cause unpredictable builds. It is recommended that a specific tag is used in the FROM line or *-released which is the latest supported release."
+        reference_url: 
+          - "https://docs.docker.com/engine/reference/builder/"
+          - "#from"
+      - 
+        label: "no_tag"
+        regex: /^[:]/
+        level: "error"
+        message: "No tag is used"
+        description: "No tag is used. It is recommended that a specific tag is used in the FROM line or *-released which is the latest supported release."
+        reference_url: 
+          - "https://docs.docker.com/engine/reference/builder/"
+          - "#from"
+
+  LABEL:
+    paramSyntaxRegex: /.+/
+    defined_namevals:
+        Maintainer:
+          valueRegex: /[\w]+/
+          message: "Label 'maintainer' is missing or has invalid format"
+          level: "error"
+          required: true 
+
+  HEALTHCHECK:
+      paramSyntaxRegex: /.+/
+      rules:
+        -
+          label: "no_run_without_https"
+          regex: /curl.*/g
+          level: "error"
+          message: "HEALTHCHECK should not include curl command"
+          description: "External tools like curl takes on the cost of installing that tool in your image, and maintaining that tool"
+          reference_url: 
+            - "https://blog.sixeyed.com/docker-healthchecks-why-not-to-use-curl-or-iwr/"
+  
+
+required_instructions:
+  -
+    instruction: "LABEL"
+    count: 1
+    description: "Labels with maintainer value is needed"
+    level: error
+    message: "No LABELs are defined"
+    reference_url:
+      - "https://docs.docker.com/engine/reference/builder/"
+      - "#label"      
+
+  -
+    instruction: "HEALTHCHECK"
+    count: 1
+    level: "error"
+    message: "No 'HEALTHCHECK' instruction in the file"
+    description: "HEALTHCHECK let you tell the platform how to test that your application is healthy, and the instructions for doing that are captured as part of your application package."
+    reference_url:
+      - "https://blog.sixeyed.com/docker-healthchecks-why-not-to-use-curl-or-iwr/"
+      

@@ -10,6 +10,7 @@ CONTAINER_NAME ?= hugo-builder-container
 
 lint: Dockerfile
 	hadolint Dockerfile
+	docker run -it --rm -v ${PWD}:/root/ projectatomic/dockerfile-lint dockerfile_lint -f Dockerfile -r policies/all_rules.yml
 
 build: lint
 	@echo "Building Hugo Builder container..."

@@ -22,6 +22,8 @@ RUN curl -o ${HUGO_FILE_TARGZ} -fSL https://github.com/gohugoio/hugo/releases/do
     && adduser -SG hugo -u 1000 -h /src hugo \
     && rm -rf /tmp/*
 
+USER hugo
+
 WORKDIR /src
 
 EXPOSE 1313
