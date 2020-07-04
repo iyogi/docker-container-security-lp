@@ -15,7 +15,13 @@ lint: Dockerfile
 build: lint
 	@echo "Building Hugo Builder container..."
 	@docker build -t ${NS}/${IMAGE_NAME} .
-	@echo "Hugo Builder container built!"
+	@echo "Hugo Builder container built. Now scanning the image for vulnerabilities"
+	@docker-compose -f clair/docker-compose.yaml up -d
+	sleep 5
+	@docker run --rm  -v /var/run/docker.sock:/var/run/docker.sock --network=container:clair ovotech/clair-scanner clair-scanner ${NS}/${IMAGE_NAME}:${VERSION}
+	@echo "No vulnerabilities found!"
+	#@echo "Stopping clair (also removing caontainer - will remove also downloaded vulnerabilities database)"
+	#@docker-compose -f clair/docker-compose.yaml rm -s -f
 	@docker images ${NS}/${IMAGE_NAME}
 
 run:
