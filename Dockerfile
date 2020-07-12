@@ -1,6 +1,15 @@
 FROM alpine:3.12.0
 
-LABEL maintainer="PS <psellars@gmail.com>"
+ARG CREATED_DATE
+ARG VCS_REF
+ARG VERSION
+LABEL maintainer="PS <psellars@gmail.com>" \
+      org.opencontainers.image.created="$CREATED_DATE" \
+      org.opencontainers.image.revision="$VCS_REF" \
+      org.opencontainers.image.version="$VERSION" \
+      org.opencontainers.image.licenses="Apache-2.0" \
+      org.opencontainers.image.url="https://github.com/iyogi/docker-container-security-lp" \
+      org.opencontainers.image.title="Making registry ontainers secure, robust and verifiable"
 
 RUN apk add --no-cache \
     curl=7.69.1-r0 \
